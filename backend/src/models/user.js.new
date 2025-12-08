@@ -1,0 +1,160 @@
+const pool = require('../config/database');
+
+// Get user by email
+const getUserByEmail = async (email) => {
+  const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  return result.rows[0] || null;
+};
+
+// Get user by ID
+const getUserById = async (id) => {
+  const result = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+  return result.rows[0] || null;
+};
+
+// Create user (returns token_version)
+const createUser = async (email, passwordHash, saltValue, encryptedPrivateKey, publicKey) => {
+  const result = await pool.query(
+    `INSERT INTO users (email, password_hash, password_salt, encrypted_private_key, public_key)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id, email, public_key, created_at, token_version`,
+    [email, passwordHash, saltValue, encryptedPrivateKey, publicKey]
+  );
+  return result.rows[0];
+};
+
+// Increment user's token_version (revokes existing tokens)
+const incrementTokenVersion = async (userId) => {
+  const result = await pool.query(
+    `UPDATE users SET token_version = COALESCE(token_version, 0) + 1, password_changed_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING token_version`,
+    [userId]
+  );
+  return result.rows[0] || null;
+};
+
+// Change password and rotate token_version
+const changePassword = async (userId, newPasswordHash, newSalt) => {
+  const result = await pool.query(
+    `UPDATE users SET password_hash = $1, password_salt = $2, token_version = COALESCE(token_version, 0) + 1, password_changed_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, token_version`,
+    [newPasswordHash, newSalt, userId]
+  );
+  return result.rows[0] || null;
+};
+
+// Update encrypted private key and rotate tokens
+const updateEncryptedPrivateKey = async (userId, newEncryptedPrivateKey) => {
+  const result = await pool.query(
+    `UPDATE users SET encrypted_private_key = $1, token_version = COALESCE(token_version, 0) + 1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, token_version`,
+    [newEncryptedPrivateKey, userId]
+  );
+  return result.rows[0] || null;
+};
+
+// Get files by owner (exclude soft-deleted)
+const getFilesByOwner = async (userId) => {
+  const result = await pool.query(
+    'SELECT id, filename, file_hash, size, created_at FROM files WHERE owner_id = $1 AND (is_deleted IS DISTINCT FROM TRUE) ORDER BY created_at DESC',
+    [userId]
+  );
+  return result.rows;
+};
+
+// Get file by ID
+const getFileById = async (fileId) => {
+  const result = await pool.query(
+    'SELECT * FROM files WHERE id = $1',
+    [fileId]
+  );
+  return result.rows[0] || null;
+};
+
+// Get file by hash (deduplication lookup)
+const getFileByHash = async (fileHash) => {
+  const result = await pool.query(
+    'SELECT * FROM files WHERE file_hash = $1 AND (is_deleted IS DISTINCT FROM TRUE) LIMIT 1',
+    [fileHash]
+  );
+  return result.rows[0] || null;
+};
+
+// Create file record
+const createFileRecord = async (ownerId, filename, fileHash, encryptedKey, filePath, fileSize) => {
+  const result = await pool.query(
+    `INSERT INTO files (owner_id, filename, file_hash, encrypted_key, file_path, size)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING id, filename, file_hash, size, created_at`,
+    [ownerId, filename, fileHash, encryptedKey, filePath, fileSize]
+  );
+  return result.rows[0];
+};
+
+// Soft delete file (mark as deleted, keep physical file)
+const deleteFile = async (fileId) => {
+  const result = await pool.query(
+    `UPDATE files SET is_deleted = TRUE, deleted_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id`,
+    [fileId]
+  );
+  return result.rows[0];
+};
+
+// Share file with user
+const shareFile = async (fileId, ownerId, recipientId, encryptedKey) => {
+  const result = await pool.query(
+    `INSERT INTO file_shares (file_id, owner_id, recipient_id, encrypted_key)
+     VALUES ($1, $2, $3, $4)
+     RETURNING id`,
+    [fileId, ownerId, recipientId, encryptedKey]
+  );
+  return result.rows[0];
+};
+
+// Get shared files for user
+const getSharedFilesForUser = async (userId) => {
+  const result = await pool.query(
+    `SELECT f.id, f.filename, f.file_hash, f.size, f.created_at, fs.encrypted_key, u.email as owner_email
+     FROM file_shares fs
+     JOIN files f ON fs.file_id = f.id
+     JOIN users u ON fs.owner_id = u.id
+     WHERE fs.recipient_id = $1
+     ORDER BY f.created_at DESC`,
+    [userId]
+  );
+  return result.rows;
+};
+
+// Log audit event
+const logAuditEvent = async (userId, action, resourceType, resourceId, details, ipAddress) => {
+  await pool.query(
+    `INSERT INTO audit_logs (user_id, action, resource_type, resource_id, details, ip_address)
+     VALUES ($1, $2, $3, $4, $5, $6)`,
+    [userId, action, resourceType, resourceId, JSON.stringify(details), ipAddress]
+  );
+};
+
+// Get user's storage stats
+const getStorageStats = async (userId) => {
+  const result = await pool.query(
+    `SELECT COUNT(*) as file_count, COALESCE(SUM(size), 0) as total_size
+     FROM files WHERE owner_id = $1`,
+    [userId]
+  );
+  return result.rows[0];
+};
+
+module.exports = {
+  getUserByEmail,
+  getUserById,
+  createUser,
+  incrementTokenVersion,
+  changePassword,
+  updateEncryptedPrivateKey,
+  getFilesByOwner,
+  getFileById,
+  getFileByHash,
+  createFileRecord,
+  deleteFile,
+  shareFile,
+  getSharedFilesForUser,
+  logAuditEvent,
+  getStorageStats
+};

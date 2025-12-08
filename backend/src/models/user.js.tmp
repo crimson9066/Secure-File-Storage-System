@@ -1,0 +1,62 @@
+const pool = require('../config/database');
+
+// Get user by email
+const getUserByEmail = async (email) => {
+  const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  return result.rows[0] || null;
+};
+
+// Get user by ID
+const getUserById = async (id) => {
+  const result = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+  return result.rows[0] || null;
+};
+
+// Create user (returns token_version)
+const createUser = async (email, passwordHash, saltValue, encryptedPrivateKey, publicKey) => {
+  const result = await pool.query(
+    `INSERT INTO users (email, password_hash, password_salt, encrypted_private_key, public_key)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id, email, public_key, created_at, token_version`,
+    [email, passwordHash, saltValue, encryptedPrivateKey, publicKey]
+  );
+  return result.rows[0];
+};
+
+// Increment user's token_version (revokes existing tokens)
+const incrementTokenVersion = async (userId) => {
+  const result = await pool.query(
+    `UPDATE users SET token_version = COALESCE(token_version, 0) + 1, password_changed_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING token_version`,
+    [userId]
+  );
+  return result.rows[0] || null;
+};
+
+// Change password and rotate token_version
+const changePassword = async (userId, newPasswordHash, newSalt) => {
+  const result = await pool.query(
+    `UPDATE users SET password_hash = $1, password_salt = $2, token_version = COALESCE(token_version, 0) + 1, password_changed_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, token_version`,
+    [newPasswordHash, newSalt, userId]
+  );
+  return result.rows[0] || null;
+};
+
+// Update encrypted private key and rotate tokens
+const updateEncryptedPrivateKey = async (userId, newEncryptedPrivateKey) => {
+  const result = await pool.query(
+    `UPDATE users SET encrypted_private_key = $1, token_version = COALESCE(token_version, 0) + 1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, token_version`,
+    [newEncryptedPrivateKey, userId]
+  );
+  return result.rows[0] || null;
+};
+
+// ... rest of file kept as-is (files, shares, audit functions)
+
+module.exports = {
+  getUserByEmail,
+  getUserById,
+  createUser,
+  incrementTokenVersion,
+  changePassword,
+  updateEncryptedPrivateKey
+};

@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: securevault-postgres
+    environment:
+      POSTGRES_DB: secure_file_storage
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/config/sql.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./src/config/sql_update_users.sql:/docker-entrypoint-initdb.d/02-migrations.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - securevault
+
+  # Redis Cache & Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: securevault-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - securevault
+
+  # Node.js Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: securevault-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: secure_file_storage
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      JWT_EXPIRE: 24h
+      RSA_KEY_SIZE: 4096
+      UPLOAD_DIR: /app/uploads
+      MAX_FILE_SIZE: 104857600
+      MAX_TOTAL_UPLOAD_SIZE: 1099511627776
+      LOG_LEVEL: info
+      CORS_WHITELIST: http://localhost:3000,http://localhost:3001,http://localhost:5000
+      TRUST_PROXY: 1
+      BODY_LIMIT: 50mb
+      AUTH_RATE_LIMIT: 10
+      GLOBAL_RATE_LIMIT: 200
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./src:/app/src
+      - ./node_modules:/app/node_modules
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - securevault
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  securevault:
+    driver: bridge
+
+# Usage:
+# docker-compose up -d                  # Start all services
+# docker-compose logs -f backend         # View backend logs
+# docker-compose exec postgres psql -U postgres -d secure_file_storage  # Access DB
+# docker-compose exec redis redis-cli    # Access Redis
+# docker-compose down                    # Stop all services
+# docker-compose down -v                 # Stop and remove volumes
