@@ -87,7 +87,7 @@
 
 ---
 
-## 📊 API Endpoints
+##  API Endpoints
 
 ### Authentication
 | Method | Endpoint | Description |
@@ -107,7 +107,7 @@
 
 ---
 
-## 🗄️ Database Schema
+##  Database Schema
 
 ### Users Table
 - `id` - UUID primary key
@@ -235,7 +235,7 @@ cd frontend && npm test
 
 ---
 
-## 📦 Dependencies
+##  Dependencies
 
 ### Backend
 - express: Web server framework
@@ -255,7 +255,7 @@ cd frontend && npm test
 
 ---
 
-## 🔍 File Sizes (Approximate)
+##  File Sizes (Approximate)
 
 | File | Size |
 |------|------|
@@ -292,7 +292,7 @@ Stateless tokens used for request authentication
 
 ---
 
-## 🔗 Related Resources
+##  Related Resources
 
 ### Security Standards
 - [NIST Cryptography Guidelines](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
@@ -342,7 +342,7 @@ Stateless tokens used for request authentication
 
 ---
 
-## 🎓 Learning Paths
+##  Learning Paths
 
 ### For Security Learners
 1. Read SECURITY.md
@@ -370,7 +370,7 @@ Stateless tokens used for request authentication
 
 ---
 
-## 📞 Support & Questions
+##  Support & Questions
 
 ### Where to Find Answers
 1. **Setup Issues:** QUICKSTART.md

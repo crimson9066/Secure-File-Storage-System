@@ -4,7 +4,7 @@
 
 A file storage system implementing end-to-end encryption. Files are encrypted on the client with AES-256-GCM before being sent to the server. The server stores only encrypted data and cannot decrypt files.
 
-### ✨ Key Features
+###  Key Features
 
 #### Security
 - **AES-256-GCM** - Military-grade symmetric encryption for files
@@ -15,7 +15,7 @@ A file storage system implementing end-to-end encryption. Files are encrypted on
 - **SHA-256** - File integrity verification
 - **JWT** - Stateless authentication tokens
 
-#### 👥 User Management
+####  User Management
 - Email-based signup and login
 - Password strength meter
 - Secure account settings
@@ -29,19 +29,19 @@ A file storage system implementing end-to-end encryption. Files are encrypted on
 - File organization and search
 - Storage statistics dashboard
 
-#### 🔗 File Sharing
+####  File Sharing
 - Share files with other users
 - Encrypt sharing keys with recipient's RSA public key
 - Recipients cannot access unshared files
 - View shared files in separate section
 
-#### 📊 Storage
+####  Storage
 - Local filesystem storage (development)
 - Cloud storage ready (S3)
 - Encrypted file storage only
 - Metadata-only database storage
 
-### 📦 What's Included
+###  What's Included
 
 ```
 Backend (Node.js + Express)
@@ -135,7 +135,7 @@ Recipient Private Key Decrypt → AES Key → Decrypt File
 Recipient Can Now Access
 ```
 
-### 📊 Project Statistics
+###  Project Statistics
 
 | Metric | Value |
 |--------|-------|
@@ -174,7 +174,7 @@ Recipient Can Now Access
 - PM2 (process manager)
 - Nginx (reverse proxy)
 
-### 📈 Scalability
+###  Scalability
 
 **Current:** Single server (development)
 
@@ -185,7 +185,7 @@ Recipient Can Now Access
 - Cache: Redis for sessions
 - Storage: S3 with versioning
 
-### 💰 Cost Estimate (AWS)
+###  Cost Estimate (AWS)
 
 | Service | Monthly Cost |
 |---------|--------------|
@@ -255,7 +255,7 @@ Recipient Can Now Access
    - Family photos and videos
    - Encrypted backup solution
 
-### 🔄 Workflow Example
+###  Workflow Example
 
 1. **User Signs Up**
    - Email: user@example.com
@@ -282,7 +282,7 @@ Recipient Can Now Access
    - Downloads and decrypts file
    - Access verified with JWT token
 
-### 🐛 Known Limitations & Future Enhancements
+###  Known Limitations & Future Enhancements
 
 #### Current Limitations
 - 100 MB file size limit (configurable)
@@ -304,7 +304,7 @@ Recipient Can Now Access
 - [ ] S3 integration
 - [ ] Automated backup
 
-### 🤝 Contributing Guidelines
+###  Contributing Guidelines
 
 To contribute to SecureVault:
 
@@ -318,20 +318,20 @@ To contribute to SecureVault:
 
 MIT License - Feel free to use for personal and commercial projects
 
-### 🙏 Acknowledgments
+###  Acknowledgments
 
 - NIST for cryptographic standards
 - OWASP for security guidelines
 - React community for amazing tools
 - Node.js community
 
-### 📞 Support
+###  Support
 
 **Documentation:**
 - [README.md](README.md)
 - [QUICKSTART.md](QUICKSTART.md)
 - [SECURITY.md](SECURITY.md)
-- 🏗️ [ARCHITECTURE.md](ARCHITECTURE.md)
+-  [ARCHITECTURE.md](ARCHITECTURE.md)
 - [API.md](API.md)
 - [TESTING.md](TESTING.md)
 - [DEPLOYMENT.md](DEPLOYMENT.md)
@@ -344,7 +344,7 @@ MIT License - Feel free to use for personal and commercial projects
 - Check documentation first
 - Ask in GitHub Discussions
 
-### 🎓 Learning Resources
+### Learning Resources
 
 **Encryption:**
 - [NIST Encryption Guidelines](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf)
@@ -361,7 +361,7 @@ MIT License - Feel free to use for personal and commercial projects
 - [React Documentation](https://react.dev/)
 - [PostgreSQL Manual](https://www.postgresql.org/docs/)
 
-### 📊 Project Metrics
+###  Project Metrics
 
 **Code Quality:**
 - JSDoc documentation: 90%

@@ -159,7 +159,7 @@ curl -X POST http://localhost:5000/api/files/chunk/init \
 
 ---
 
-## 🔄 Docker Compose Commands
+##  Docker Compose Commands
 
 ```bash
 cd backend
@@ -185,7 +185,7 @@ docker-compose down -v
 
 ---
 
-## 🗄️ Database Commands
+##  Database Commands
 
 ### PostgreSQL
 ```bash
@@ -456,7 +456,7 @@ Redis:
 
 ---
 
-## 🎊 You're All Set!
+##  You're All Set!
 
 **You can now:**
 - Run backend with Redis

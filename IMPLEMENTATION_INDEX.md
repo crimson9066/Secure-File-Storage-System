@@ -230,7 +230,7 @@ ALTER TABLE users ADD COLUMN password_changed_at TIMESTAMP;
 
 ---
 
-## 📊 Code Quality Metrics
+##  Code Quality Metrics
 
 | Metric | Value |
 |--------|-------|
@@ -274,7 +274,7 @@ ALTER TABLE users ADD COLUMN password_changed_at TIMESTAMP;
 
 ---
 
-## 🔗 Related Files (Existing)
+##  Related Files (Existing)
 
 - `README.md` - Main project documentation
 - `SECURITY.md` - Encryption architecture
@@ -321,7 +321,7 @@ node test-chunked-upload.js
 
 ---
 
-## 📞 Support Resources
+##  Support Resources
 
 ### For Testing
 - See: `backend/TESTING_REDIS_JWT.md`

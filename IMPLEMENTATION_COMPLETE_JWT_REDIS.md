@@ -66,27 +66,27 @@ Request B retries: acquireLock → success
 
 ### JWT Token Version Tests (9 tests)
 ```
-✅ Test 1: Token generation includes token_version
-✅ Test 2: Token verification rejects mismatched token_version
-✅ Test 3: Token verification accepts matching token_version
-✅ Test 4: Token without token_version is rejected
-✅ Test 5: Create and retrieve upload session
-✅ Test 6: Record chunks and track uploaded indices
-✅ Test 7: Acquire and release finalize lock
-✅ Test 8: Lock prevents concurrent finalize attempts
-✅ Test 9: Token version increments on password/key changes
+Test 1: Token generation includes token_version
+Test 2: Token verification rejects mismatched token_version
+Test 3: Token verification accepts matching token_version
+Test 4: Token without token_version is rejected
+Test 5: Create and retrieve upload session
+Test 6: Record chunks and track uploaded indices
+Test 7: Acquire and release finalize lock
+Test 8: Lock prevents concurrent finalize attempts
+Test 9: Token version increments on password/key changes
 ```
 
 ### Chunked Upload Tests (8 tests)
 ```
-✅ Test 1: Create upload session
-✅ Test 2: Record multiple chunks
-✅ Test 3: Retrieve session and verify uploaded chunks
-✅ Test 4: Retrieve chunk data
-✅ Test 5: Acquire finalize lock
-✅ Test 6: Release lock and allow new acquisition
-✅ Test 7: Clean up session and all chunks
-✅ Test 8: Simulate finalize race condition handling
+ Test 1: Create upload session
+ Test 2: Record multiple chunks
+ Test 3: Retrieve session and verify uploaded chunks
+ Test 4: Retrieve chunk data
+ Test 5: Acquire finalize lock
+ Test 6: Release lock and allow new acquisition
+ Test 7: Clean up session and all chunks
+ Test 8: Simulate finalize race condition handling
 ```
 
 **Result:** ALL 17 TESTS PASSING
@@ -114,9 +114,9 @@ Request B retries: acquireLock → success
 
 ---
 
-## 🔐 Security Features Verified
+##  Security Features Verified
 
-### Token Revocation ✅
+### Token Revocation 
 - [x] token_version included in JWT payload during signup/login
 - [x] Auth middleware fetches user from DB on every request
 - [x] Compares JWT token_version with current database value
@@ -124,14 +124,14 @@ Request B retries: acquireLock → success
 - [x] Password change increments token_version
 - [x] Private key update increments token_version
 
-### Upload Session Persistence ✅
+### Upload Session Persistence 
 - [x] Sessions stored in Redis (not in-memory)
 - [x] Sessions survive server restarts
 - [x] Multi-instance safe (all servers access same Redis)
 - [x] TTL automatically removes expired sessions (24h)
 - [x] Chunks stored with hash for integrity verification
 
-### Race Condition Prevention ✅
+### Race Condition Prevention 
 - [x] Finalize uses distributed lock
 - [x] Only one process can finalize at a time
 - [x] Lock prevented by atomic SET NX operation
@@ -140,7 +140,7 @@ Request B retries: acquireLock → success
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 ### Quick Start (Docker)
 ```bash
@@ -165,7 +165,7 @@ npm run dev
 
 ---
 
-## 📊 Architecture Changes
+##  Architecture Changes
 
 ### Before (In-Memory)
 ```
@@ -201,20 +201,20 @@ npm run dev
 
 ---
 
-## ✨ Key Improvements
+##  Key Improvements
 
 | Feature | Before | After |
 |---------|--------|-------|
-| **Token Revocation** | ❌ Not supported | ✅ Full support |
-| **Session Persistence** | ❌ Lost on restart | ✅ Survives Redis |
-| **Multi-Instance** | ❌ Sessions not shared | ✅ Shared via Redis |
-| **Race Conditions** | ❌ Possible on finalize | ✅ Locked atomically |
-| **Session Expiry** | ❌ Manual cleanup | ✅ Redis TTL |
-| **Scalability** | ⚠️ Single server | ✅ Horizontal scaling |
+| **Token Revocation** |  Not supported |  Full support |
+| **Session Persistence** |  Lost on restart |  Survives Redis |
+| **Multi-Instance** | Sessions not shared |  Shared via Redis |
+| **Race Conditions** |  Possible on finalize |  Locked atomically |
+| **Session Expiry** |  Manual cleanup |  Redis TTL |
+| **Scalability** |  Single server |  Horizontal scaling |
 
 ---
 
-## 🎯 Testing Workflow
+##  Testing Workflow
 
 ```
 1. Run JWT tests
@@ -239,7 +239,7 @@ npm run dev
 
 ---
 
-## 📚 Documentation
+##  Documentation
 
 - **[TESTING_REDIS_JWT.md](./TESTING_REDIS_JWT.md)** - Comprehensive testing guide
 - **[QUICKSTART_REDIS.md](./QUICKSTART_REDIS.md)** - Quick start instructions
@@ -267,7 +267,7 @@ npm run dev
 
 ---
 
-## ⚠️ Considerations
+##  Considerations
 
 ### Production Deployment
 - [ ] Enable Redis persistence (`appendonly yes`)
@@ -290,7 +290,7 @@ npm run dev
 
 ---
 
-## ✅ Acceptance Criteria
+##  Acceptance Criteria
 
 - [x] JWT includes token_version
 - [x] Token version validated on every request
@@ -305,14 +305,14 @@ npm run dev
 
 ---
 
-## 🎉 Summary
+##  Summary
 
-✅ **JWT Token Version Revocation** implemented and tested  
-✅ **Redis-Backed Upload Sessions** implemented and tested  
-✅ **Finalize Locking** implemented and tested  
-✅ **17/17 Tests Passing**  
-✅ **Docker Compose Support** added  
-✅ **Comprehensive Documentation** provided  
+**JWT Token Version Revocation** implemented and tested  
+**Redis-Backed Upload Sessions** implemented and tested  
+**Finalize Locking** implemented and tested  
+**17/17 Tests Passing**  
+**Docker Compose Support** added  
+**Comprehensive Documentation** provided  
 
 **System is production-ready for deployment!**
 

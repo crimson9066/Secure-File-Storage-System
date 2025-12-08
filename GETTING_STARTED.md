@@ -68,12 +68,12 @@ SecureVault/
 
 ## 5-Minute Quick Start
 
-### 1️⃣ Prerequisites
+### 1️ Prerequisites
 - Node.js v14+ ([Download](https://nodejs.org/))
 - PostgreSQL ([Download](https://www.postgresql.org/download/))
 - Git ([Download](https://git-scm.com/))
 
-### 2️⃣ Clone & Setup
+### 2️ Clone & Setup
 ```bash
 # Clone project (or extract if downloaded)
 git clone https://github.com/yourusername/securevault.git
@@ -87,7 +87,7 @@ cd securevault
 setup.bat
 ```
 
-### 3️⃣ Create Database
+### 3️ Create Database
 ```bash
 # Create database
 createdb secure_file_storage
@@ -103,7 +103,7 @@ cd backend && ./setup-db.sh
 cd backend && setup-db.bat
 ```
 
-### 4️⃣ Configure Environment
+### 4️ Configure Environment
 **Backend** - Create `backend/.env`:
 ```
 NODE_ENV=development
@@ -124,7 +124,7 @@ MAX_FILE_SIZE=104857600
 REACT_APP_API_URL=http://localhost:5000/api
 ```
 
-### 5️⃣ Install & Start
+### 5️ Install & Start
 ```bash
 # Terminal 1 - Backend
 cd backend
@@ -139,7 +139,7 @@ npm start
 # Opens http://localhost:3000 automatically
 ```
 
-### 6️⃣ Create Account & Test
+### 6️ Create Account & Test
 1. Go to http://localhost:3000
 2. Click "Sign up"
 3. Email: `test@example.com`
@@ -188,7 +188,7 @@ YOU                     SERVER              THEM
 
 ---
 
-## 🎓 Documentation Guide
+##  Documentation Guide
 
 ### Where to Start?
 1. **New to project?** → Read [QUICKSTART.md](QUICKSTART.md)
@@ -206,26 +206,26 @@ YOU                     SERVER              THEM
 
 ### For Users
 - **Upload files** with drag-and-drop
-- 📊 **Progress tracking** during upload
-- 🔗 **Share files** securely with others
-- ⬇️ **Download encrypted files** automatically decrypts on your device
-- 🔍 **Manage files** with list view and storage stats
-- ⚙️ **Settings** for account management
+-  **Progress tracking** during upload
+-  **Share files** securely with others
+-  **Download encrypted files** automatically decrypts on your device
+-  **Manage files** with list view and storage stats
+-  **Settings** for account management
 
 ### For Security
 - **AES-256-GCM** - Military-grade encryption
-- 🔑 **RSA-4096** - Quantum-resistant key sharing
+- **RSA-4096** - Quantum-resistant key sharing
 - **Zero-knowledge** - Server cannot decrypt files
 - **Authenticated encryption** - Detects tampering
 - **Audit logging** - All operations logged
-- 🛡️ **JWT tokens** - Stateless authentication
+- **JWT tokens** - Stateless authentication
 
 ### For Developers
 - **Well documented** - 8 comprehensive guides
 - **Clean code** - Organized, commented, maintainable
 - **Test friendly** - Easy to write tests
-- 🔄 **Modern stack** - React, Express, PostgreSQL
-- 📦 **Modular** - Easy to extend
+- **Modern stack** - React, Express, PostgreSQL
+- **Modular** - Easy to extend
 - **Production ready** - Best practices implemented
 
 ---
@@ -321,7 +321,7 @@ Owner's private key can't access friend's copy ✓
 
 ---
 
-## ⚖️ Security Architecture at a Glance
+##  Security Architecture at a Glance
 
 | Layer | Protection |
 |-------|-----------|
@@ -336,7 +336,7 @@ Owner's private key can't access friend's copy ✓
 
 ---
 
-## 📊 Project Statistics
+##  Project Statistics
 
 | Metric | Value |
 |--------|-------|
@@ -404,7 +404,7 @@ Owner's private key can't access friend's copy ✓
 
 ---
 
-## 🤔 FAQ
+##  FAQ
 
 ### Q: Can the server see my files?
 **A:** No. Files are encrypted on your device before sending to server. Server only stores encrypted bytes (gibberish).
@@ -435,7 +435,7 @@ Owner's private key can't access friend's copy ✓
 
 ---
 
-## 🔗 Useful Links
+##  Useful Links
 
 ### Documentation
 - [Main README](README.md) - Comprehensive guide
@@ -453,7 +453,7 @@ Owner's private key can't access friend's copy ✓
 
 ---
 
-## 💬 Support
+##  Support
 
 ### Issues?
 1. Check [FILE_INDEX.md](FILE_INDEX.md) for file locations
