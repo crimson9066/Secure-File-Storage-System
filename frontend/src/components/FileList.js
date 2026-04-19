@@ -19,7 +19,6 @@ export const FileList = ({ files, sharedFiles, onRefresh }) => {
 
     setLoading(true);
     try {
-      // In production, encrypt the key with recipient's public key
       const encryptedKey = selectedFile?.encrypted_key || selectedFile?.encryptedKey;
 
       await apiCall('/files/share', {
@@ -62,7 +61,6 @@ export const FileList = ({ files, sharedFiles, onRefresh }) => {
     setLoading(true);
     try {
       const response = await apiCall(`/files/download/${file.id}`);
-      // Client-side decryption happens elsewhere; show notification
       addNotification('Download ready — decrypt client-side', 'success');
     } catch (error) {
       addNotification(`Download failed: ${error.message}`, 'error');
@@ -117,7 +115,7 @@ export const FileList = ({ files, sharedFiles, onRefresh }) => {
                           className="text-blue-500 hover:text-blue-700 mr-3"
                           title="Download"
                         >
-                          ⬇️
+                          <span className="text-sm font-medium">Download</span>
                         </button>
                         <button
                           onClick={() => {
@@ -127,7 +125,7 @@ export const FileList = ({ files, sharedFiles, onRefresh }) => {
                           className="text-green-500 hover:text-green-700 mr-3"
                           title="Share"
                         >
-                          🔗
+                          <span className="text-sm font-medium">Share</span>
                         </button>
                         <button
                           onClick={() => {
@@ -137,7 +135,7 @@ export const FileList = ({ files, sharedFiles, onRefresh }) => {
                           className="text-red-500 hover:text-red-700"
                           title="Delete"
                         >
-                          🗑️
+                          <span className="text-sm font-medium">Delete</span>
                         </button>
                       </td>
                     </tr>
@@ -176,7 +174,7 @@ export const FileList = ({ files, sharedFiles, onRefresh }) => {
                           className="text-blue-500 hover:text-blue-700"
                           title="Download"
                         >
-                          ⬇️
+                          <span className="text-sm font-medium">Download</span>
                         </button>
                       </td>
                     </tr>

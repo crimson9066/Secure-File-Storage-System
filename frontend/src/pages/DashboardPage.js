@@ -21,7 +21,6 @@ export const DashboardPage = () => {
   const { addNotification } = useContext(NotificationContext);
   const navigate = useNavigate();
 
-  // Load files on mount
   useEffect(() => {
     loadFiles();
   }, []);
@@ -51,17 +50,13 @@ export const DashboardPage = () => {
     setUploadProgress(0);
 
     try {
-      // Read file
       const fileBuffer = await file.arrayBuffer();
       const buffer = new Uint8Array(fileBuffer);
 
-      // Encrypt file
       const encrypted = await encryptFileData(buffer);
       
-      // Calculate hash
       const fileHash = await calculateSHA256(buffer);
 
-      // Create upload with progress tracking
       const formData = new FormData();
       formData.append('file', new Blob([encrypted.encryptedData]), file.name);
       formData.append('encryptedKey', JSON.stringify({
@@ -69,20 +64,9 @@ export const DashboardPage = () => {
         ivBase64: encrypted.ivBase64
       }));
 
-      // Simulate progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return prev + Math.random() * 30;
-        });
-      }, 200);
-
+      setUploadProgress(0);
       const response = await uploadFile(formData.get('file'), formData.get('encryptedKey'));
 
-      clearInterval(progressInterval);
       setUploadProgress(100);
 
       addNotification(`${file.name} uploaded successfully`, 'success');
@@ -187,7 +171,7 @@ export const DashboardPage = () => {
             <h3 className="font-semibold text-lg text-gray-800 mb-4">Account</h3>
             <p className="text-gray-600 mb-2">Email: {user?.email}</p>
             <button
-              onClick={() => addNotification('Feature coming soon', 'info')}
+              onClick={() => {}}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
             >
               Change Password
@@ -197,13 +181,13 @@ export const DashboardPage = () => {
           <div className="border-b pb-4">
             <h3 className="font-semibold text-lg text-gray-800 mb-4">Security</h3>
             <button
-              onClick={() => addNotification('Feature coming soon', 'info')}
+              onClick={() => {}}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 mr-2"
             >
               Backup Private Key
             </button>
             <button
-              onClick={() => addNotification('Feature coming soon', 'info')}
+              onClick={() => {}}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
             >
               Enable 2FA

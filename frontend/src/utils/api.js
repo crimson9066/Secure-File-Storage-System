@@ -14,6 +14,7 @@ export const apiCall = async (endpoint, options = {}) => {
 
   try {
     const response = await fetch(url, {
+      credentials: 'include',
       ...options,
       headers
     });
@@ -42,6 +43,7 @@ export const uploadFile = async (file, encryptedKey) => {
   try {
     const response = await fetch(`${API_URL}/files/upload`, {
       method: 'POST',
+      credentials: 'include',
       headers,
       body: formData
     });

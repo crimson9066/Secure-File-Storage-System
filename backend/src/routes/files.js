@@ -13,8 +13,7 @@ const {
   createFileRecord, 
   deleteFile, 
   shareFile, 
-  getSharedFilesForUser, 
-  logAuditEvent,
+  getSharedFilesForUser,
   getStorageStats,
   getUserById,
   getUserByEmail
@@ -26,12 +25,8 @@ const {
   ValidationError,
   StorageError
 } = require('../utils/vaultErrors');
-const FeatureFlagEngine = require('../utils/featureFlags');
 
-// Feature flag engine for gradual rollout
-const featureFlags = new FeatureFlagEngine();
 
-// Configure multer
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -39,7 +34,6 @@ const upload = multer({
   }
 });
 
-// Upload file with deduplication
 router.post('/upload', upload.single('file'), async (req, res, next) => {
   try {
     const { encryptedKey } = req.body;
@@ -48,15 +42,10 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       throw new ValidationError('File and encryptedKey required', { missingFields: !req.file ? ['file'] : ['encryptedKey'] });
     }
 
-    // Check if user has chunked upload feature enabled
-    if (!featureFlags.isEnabled('chunkedUpload', req.user)) {
-      vaultLogger.warn('Chunked upload disabled for user', { userId: req.user.userId });
-    }
 
-    // Compute file hash for deduplication
+
     const fileHash = hashFile(req.file.buffer);
 
-    // Check for existing identical file
     const existing = await getFileByHash(fileHash);
 
     const uploadDir = process.env.UPLOAD_DIR || './uploads';
@@ -78,7 +67,6 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       await fs.writeFile(filePath, req.file.buffer);
     }
 
-    // Create database record
     const record = await createFileRecord(
       req.user.userId,
       req.file.originalname,
@@ -88,12 +76,7 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
       req.file.size
     );
 
-    // Audit log
-    await logAuditEvent(req.user.userId, 'FILE_UPLOAD', 'FILE', record.id, {
-      filename: req.file.originalname,
-      size: req.file.size,
-      deduplicated: !!existing
-    }, req.ip);
+
 
     vaultLogger.audit('File uploaded', {
       userId: req.user.userId,
@@ -115,7 +98,6 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
   }
 });
 
-// List user's files
 router.get('/list', async (req, res, next) => {
   try {
     const files = await getFilesByOwner(req.user.userId);
@@ -141,7 +123,6 @@ router.get('/list', async (req, res, next) => {
   }
 });
 
-// Download file
 router.get('/download/:fileId', async (req, res, next) => {
   try {
     const { fileId } = req.params;
@@ -151,7 +132,6 @@ router.get('/download/:fileId', async (req, res, next) => {
       throw new FileNotFoundError(`File not found: ${fileId}`, { fileId });
     }
     
-    // Check access (owner or shared)
     if (file.owner_id !== req.user.userId) {
       const sharedFile = await getSharedFilesForUser(req.user.userId);
       const hasAccess = sharedFile.some(sf => sf.id === fileId);
@@ -161,14 +141,10 @@ router.get('/download/:fileId', async (req, res, next) => {
       }
     }
     
-    // Read encrypted file (streaming could be implemented for large files)
     const encryptedData = await fs.readFile(file.file_path);
     
     // Audit log
-    await logAuditEvent(req.user.userId, 'FILE_DOWNLOAD', 'FILE', fileId, {
-      filename: file.filename,
-      size: file.size
-    }, req.ip);
+
     
     vaultLogger.audit('File downloaded', {
       userId: req.user.userId,
@@ -190,7 +166,6 @@ router.get('/download/:fileId', async (req, res, next) => {
   }
 });
 
-// Soft-delete file
 router.delete('/delete/:fileId', async (req, res, next) => {
   try {
     const { fileId } = req.params;
@@ -205,13 +180,10 @@ router.delete('/delete/:fileId', async (req, res, next) => {
       throw new FileAccessDeniedError('You can only delete your own files', { fileId, ownerId: file.owner_id });
     }
 
-    // Soft delete (mark record as deleted, don't remove physical file)
     await deleteFile(fileId);
 
     // Audit log
-    await logAuditEvent(req.user.userId, 'FILE_DELETE', 'FILE', fileId, {
-      filename: file.filename
-    }, req.ip);
+
 
     vaultLogger.audit('File deleted', {
       userId: req.user.userId,
@@ -225,7 +197,6 @@ router.delete('/delete/:fileId', async (req, res, next) => {
   }
 });
 
-// Share file with user
 router.post('/share', async (req, res, next) => {
   try {
     const { fileId, recipientEmail, encryptedKey } = req.body;
@@ -251,14 +222,10 @@ router.post('/share', async (req, res, next) => {
       throw new FileNotFoundError(`Recipient user not found: ${recipientEmail}`, { recipientEmail });
     }
     
-    // Share file
     const share = await shareFile(fileId, req.user.userId, recipientUser.id, encryptedKey);
     
     // Audit log
-    await logAuditEvent(req.user.userId, 'FILE_SHARE', 'FILE', fileId, {
-      filename: file.filename,
-      recipientEmail: recipientEmail
-    }, req.ip);
+
     
     vaultLogger.audit('File shared', {
       userId: req.user.userId,

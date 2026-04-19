@@ -10,7 +10,7 @@ const pool = require('../config/database');
  */
 const getUserByEmail = async (email) => {
   const result = await pool.query(
-    'SELECT id, email, password_hash, password_salt, encrypted_private_key, public_key, token_version, password_changed_at, created_at FROM users WHERE email = $1',
+    'SELECT id, email, password_hash, password_salt, encrypted_private_key, public_key, token_version, created_at FROM users WHERE email = $1',
     [email]
   );
   return result.rows[0] || null;
@@ -27,7 +27,7 @@ const getUserByEmail = async (email) => {
  */
 const getUserById = async (id) => {
   const result = await pool.query(
-    'SELECT id, email, public_key, encrypted_private_key, token_version, password_changed_at, created_at FROM users WHERE id = $1',
+    'SELECT id, email, public_key, encrypted_private_key, token_version, created_at FROM users WHERE id = $1',
     [id]
   );
   return result.rows[0] || null;
@@ -123,9 +123,9 @@ const incrementTokenVersion = async (userId) => {
 const changePassword = async (userId, newPasswordHash, newSalt) => {
   const result = await pool.query(
     `UPDATE users
-     SET password_hash = $1, password_salt = $2, password_changed_at = CURRENT_TIMESTAMP, token_version = token_version + 1
+     SET password_hash = $1, password_salt = $2, token_version = token_version + 1
      WHERE id = $3
-     RETURNING token_version, password_changed_at`,
+     RETURNING token_version`,
     [newPasswordHash, newSalt, userId]
   );
   return result.rows[0] || null;
@@ -381,46 +381,6 @@ const getSharedFilesForUser = async (userId) => {
   return result.rows;
 };
 
-/**
- * LOG AUDIT EVENT
- * Record security-relevant events for compliance and investigation.
- * 
- * AUDIT TRAIL INCLUDES:
- * - user_id: Who performed the action
- * - action: What happened (upload, download, share, delete, etc.)
- * - resource_type: Type of resource (file, user, share)
- * - resource_id: ID of affected resource
- * - details: Additional context (JSON string)
- * - ip_address: Client IP for geographic/anomaly detection
- * - hmac: Optional HMAC for tamper detection
- * - hmac_version: HMAC algorithm version (for future updates)
- * 
- * USE CASES:
- * - Security investigation: "Who accessed this file when?"
- * - Compliance: "Provide audit log for this time period"
- * - Anomaly detection: "Many deletions from same IP?"
- * - Insider threat: "Did employee access files after leaving?"
- * 
- * WHY HMAC (Optional):
- * - Detect if audit log was tampered with
- * - Verify log wasn't modified after the fact
- * - For high-security deployments only
- * 
- * RETENTION:
- * - Logs never deleted (immutable append-only table)
- * - Keep indefinitely for compliance
- * - Archive to cold storage if table grows too large
- * - Query performance: Index on (user_id, created_at) for user access patterns
- * 
- * Returns: None (insert only)
- */
-const logAuditEvent = async (userId, action, resourceType, resourceId, details, ipAddress, hmac = null, hmac_version = null) => {
-  await pool.query(
-    `INSERT INTO audit_logs (user_id, action, resource_type, resource_id, details, ip_address, hmac, hmac_version)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-    [userId, action, resourceType, resourceId, JSON.stringify(details), ipAddress, hmac, hmac_version]
-  );
-};
 
 /**
  * GET STORAGE STATS
@@ -469,6 +429,5 @@ module.exports = {
   deleteFile,
   shareFile,
   getSharedFilesForUser,
-  logAuditEvent,
   getStorageStats
 };

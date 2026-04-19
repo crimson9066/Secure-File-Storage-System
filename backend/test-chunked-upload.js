@@ -83,13 +83,7 @@ console.log('='.repeat(60) + '\n');
 let passCount = 0;
 let failCount = 0;
 
-/**
- * Test 1: Upload session creation
- * 
- * Verifies that upload sessions are created with all required metadata
- * and stored in Redis with a 24-hour TTL.
- */
-console.log('Test 1: Create upload session');
+// Verify upload session creation and TTL
 try {
   const redis = new MockRedis();
   
@@ -125,13 +119,7 @@ try {
   failCount++;
 }
 
-/**
- * Test 2: Record multiple chunks
- * 
- * Simulates uploading 10 chunks of a multi-chunk upload.
- * Chunks are tracked in Redis SET for fast count operations.
- */
-console.log('Test 2: Record multiple chunks');
+// Verify chunk recording in Redis SET
 try {
   const redis = new MockRedis();
   
@@ -154,13 +142,7 @@ try {
   failCount++;
 }
 
-/**
- * Test 3: Retrieve session with uploaded chunk count
- * 
- * Verifies that session metadata can be retrieved along with
- * the set of uploaded chunk indices for progress reporting.
- */
-console.log('Test 3: Retrieve session and verify uploaded chunks');
+// Verify session retrieval with chunk progress
 try {
   const redis = new MockRedis();
   
@@ -199,13 +181,7 @@ try {
   failCount++;
 }
 
-/**
- * Test 4: Retrieve chunk data
- * 
- * Verifies that individual chunk data can be retrieved from Redis
- * and used for file assembly during finalization.
- */
-console.log('Test 4: Retrieve chunk data');
+// Verify chunk data retrieval
 try {
   const redis = new MockRedis();
   
@@ -227,13 +203,7 @@ try {
   failCount++;
 }
 
-/**
- * Test 5: Acquire finalize lock
- * 
- * Verifies that only one server instance can acquire the finalization lock.
- * Lock prevents concurrent assembly of the same upload.
- */
-console.log('Test 5: Acquire finalize lock');
+// Verify non-concurrent finalize lock acquisition
 try {
   const redis = new MockRedis();
   
@@ -254,13 +224,7 @@ try {
   failCount++;
 }
 
-/**
- * Test 6: Release lock and allow re-acquisition
- * 
- * Verifies that after releasing the lock, another process
- * can acquire it for its own finalization attempt.
- */
-console.log('Test 6: Release lock and allow new acquisition');
+// Verify lock release and re-acquisition
 try {
   const redis = new MockRedis();
   
@@ -286,13 +250,7 @@ try {
   failCount++;
 }
 
-/**
- * Test 7: Session cleanup after finalization
- * 
- * Verifies that session metadata and all associated chunks
- * are removed from Redis after successful finalization.
- */
-console.log('Test 7: Clean up session and all chunks');
+// Verify complete session and chunk cleanup
 try {
   const redis = new MockRedis();
   
@@ -330,16 +288,7 @@ try {
   failCount++;
 }
 
-/**
- * Test 8: Race condition handling
- * 
- * Simulates two servers attempting to finalize simultaneously.
- * Demonstrates how lock prevents race condition:
- * - Server A acquires lock and finalizes
- * - Server B waits, then acquires lock after A releases
- * - Only one finalization proceeds at a time
- */
-console.log('Test 8: Simulate finalize race condition handling');
+// Verify race condition handling with concurrent finalization
 try {
   const redis = new MockRedis();
   

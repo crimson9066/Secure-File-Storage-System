@@ -2,27 +2,22 @@
  * Client-side encryption utilities using Web Crypto API
  */
 
-// AES-256-GCM Encryption
 export const encryptFileData = async (fileBuffer) => {
   try {
-    // Generate random key
     const key = await window.crypto.subtle.generateKey(
       { name: 'AES-GCM', length: 256 },
       true,
       ['encrypt', 'decrypt']
     );
 
-    // Generate random IV
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
 
-    // Encrypt
     const encryptedData = await window.crypto.subtle.encrypt(
       { name: 'AES-GCM', iv: iv },
       key,
       fileBuffer
     );
 
-    // Export key to base64
     const keyData = await window.crypto.subtle.exportKey('raw', key);
     const keyBuffer = new Uint8Array(keyData);
     const keyBase64 = btoa(String.fromCharCode.apply(null, keyBuffer));
@@ -41,14 +36,11 @@ export const encryptFileData = async (fileBuffer) => {
   }
 };
 
-// AES-256-GCM Decryption
 export const decryptFileData = async (encryptedData, keyBase64, ivBase64) => {
   try {
-    // Convert from base64
     const keyBuffer = Uint8Array.from(atob(keyBase64), c => c.charCodeAt(0));
     const iv = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
 
-    // Import key
     const key = await window.crypto.subtle.importKey(
       'raw',
       keyBuffer,
@@ -57,7 +49,6 @@ export const decryptFileData = async (encryptedData, keyBase64, ivBase64) => {
       ['decrypt']
     );
 
-    // Decrypt
     const decrypted = await window.crypto.subtle.decrypt(
       { name: 'AES-GCM', iv: iv },
       key,
@@ -71,11 +62,8 @@ export const decryptFileData = async (encryptedData, keyBase64, ivBase64) => {
   }
 };
 
-// RSA Encryption (simulate with webcrypto)
 export const encryptKeyWithPublicKey = async (symmetricKey, publicKeyPem) => {
   try {
-    // For production, use RSA-OAEP with SHA-256
-    // This is a simplified version - in production, use crypto-js or similar
     const publicKey = await window.crypto.subtle.importKey(
       'spki',
       pem2der(publicKeyPem),
@@ -97,7 +85,6 @@ export const encryptKeyWithPublicKey = async (symmetricKey, publicKeyPem) => {
   }
 };
 
-// Convert PEM to DER format
 const pem2der = (pem) => {
   const lines = pem.split('\n');
   let encoded = '';
@@ -107,14 +94,12 @@ const pem2der = (pem) => {
   return Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
 };
 
-// Calculate file SHA-256 hash
 export const calculateSHA256 = async (fileBuffer) => {
   const hashBuffer = await window.crypto.subtle.digest('SHA-256', fileBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 };
 
-// Generate random password
 export const generateRandomPassword = (length = 32) => {
   const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
   let password = '';
@@ -124,7 +109,6 @@ export const generateRandomPassword = (length = 32) => {
   return password;
 };
 
-// Check password strength
 export const checkPasswordStrength = (password) => {
   let strength = 0;
   const feedback = [];

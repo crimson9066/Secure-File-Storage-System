@@ -3,40 +3,6 @@ const { getUserById } = require('../models/user');
 const vaultLogger = require('../utils/vaultLogger');
 const { InvalidTokenError, AuthenticationError } = require('../utils/vaultErrors');
 
-/**
- * AUTHENTICATION MIDDLEWARE
- * Validates JWT tokens and enforces token revocation via token_version field.
- * 
- * FLOW:
- * 1. Extract Bearer token from Authorization header
- * 2. Verify JWT signature, expiration, and basic claims
- * 3. Query database for current user to fetch active token_version
- * 4. Compare token's embedded token_version with database value
- * 5. If versions don't match, token is considered revoked
- * 
- * WHY THIS APPROACH (Stateless Token Revocation):
- * - Traditional approach: Keep revocation list in memory/cache (loses data on restart)
- * - Database lookup approach (used here):
- *   - Requires synchronous token_version check
- *   - Ensures revocation across all server instances
- *   - Single database field (token_version) to invalidate all old tokens
- *   - Token_version incremented on password change, private key update, manual logout
- * 
- * TRADE-OFFS:
- * - Pro: True stateless revocation, no cache needed, simple implementation
- * - Con: One extra database query per request (negligible for most workloads)
- * 
- * ALTERNATIVES CONSIDERED:
- * - Redis-backed revocation list: Requires cache, loses data on restart (bad)
- * - Server restart clears tokens: Unreliable, breaks multi-instance deployments
- * - No revocation: Tokens live until expiration (security risk if key compromised)
- * - Token blacklist in DB: Same cost as token_version but more complex
- * 
- * SECURITY NOTES:
- * - Only async because database lookup is I/O; necessary for revocation to work
- * - token_version assumed immutable after JWT issued (user can't change once logged in)
- * - Revocation is atomic: incrementing token_version invalidates all existing tokens
- */
 const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;

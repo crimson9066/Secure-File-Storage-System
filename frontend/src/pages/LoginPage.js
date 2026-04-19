@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { NotificationContext } from '../context/NotificationContext';
@@ -11,9 +11,25 @@ export const LoginPage = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [csrfToken, setCsrfToken] = useState('');
   const { login } = useContext(AuthContext);
   const { addNotification } = useContext(NotificationContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/csrf-token`, {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        setCsrfToken(data.csrfToken);
+      } catch (err) {
+        console.error('Failed to fetch CSRF token', err);
+      }
+    };
+    fetchCsrfToken();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,6 +55,9 @@ export const LoginPage = () => {
       const endpoint = isSignup ? '/auth/signup' : '/auth/login';
       const response = await apiCall(endpoint, {
         method: 'POST',
+        headers: {
+          'X-CSRF-Token': csrfToken
+        },
         body: JSON.stringify({ email, password })
       });
 
@@ -83,7 +102,7 @@ export const LoginPage = () => {
             </label>
             <PasswordInput
               value={password}
-              onChange={setPassword}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />

@@ -13,8 +13,7 @@ const {
   createFileRecord, 
   deleteFile, 
   shareFile, 
-  getSharedFilesForUser, 
-  logAuditEvent,
+  getSharedFilesForUser,
   getStorageStats,
   getUserById,
   getUserByEmail
@@ -72,11 +71,7 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
     );
 
     // Log audit event
-    await logAuditEvent(req.user.userId, 'FILE_UPLOAD', 'FILE', record.id, {
-      filename: req.file.originalname,
-      size: req.file.size,
-      deduplicated: !!existing
-    }, req.ip);
+
 
     res.status(201).json({
       fileId: record.id,
@@ -138,9 +133,7 @@ router.get('/download/:fileId', authMiddleware, async (req, res) => {
     const encryptedData = await fs.readFile(file.file_path);
     
     // Log audit event
-    await logAuditEvent(req.user.userId, 'FILE_DOWNLOAD', 'FILE', fileId, {
-      filename: file.filename
-    }, req.ip);
+
     
     res.json({
       fileId: file.id,
@@ -175,9 +168,7 @@ router.delete('/delete/:fileId', authMiddleware, async (req, res) => {
     await deleteFile(fileId);
 
     // Log audit event
-    await logAuditEvent(req.user.userId, 'FILE_DELETE', 'FILE', fileId, {
-      filename: file.filename
-    }, req.ip);
+
 
     res.json({ success: true, softDeleted: true });
   } catch (error) {
@@ -212,10 +203,7 @@ router.post('/share', authMiddleware, validateRequest(shareFileSchema), async (r
     const share = await shareFile(fileId, req.user.userId, recipientUser.id, encryptedKey);
     
     // Log audit event
-    await logAuditEvent(req.user.userId, 'FILE_SHARE', 'FILE', fileId, {
-      filename: file.filename,
-      recipientEmail: recipientEmail
-    }, req.ip);
+
     
     res.status(201).json({
       shareId: share.id,

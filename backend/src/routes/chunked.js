@@ -15,7 +15,7 @@ const {
   getChunkData,
   getUploadedCount
 } = require('../models/uploadSession');
-const { createFileRecord, logAuditEvent } = require('../models/user');
+const { createFileRecord } = require('../models/user');
 const { validateRequest, initChunkUploadSchema, appendChunkSchema, finalizeChunkUploadSchema } = require('../validation/schemas');
 const vaultLogger = require('../utils/vaultLogger');
 const {
@@ -334,11 +334,7 @@ router.post('/chunk/finalize', validateRequest(finalizeChunkUploadSchema), async
       );
 
       // Audit log
-      await logAuditEvent(session.userId, 'FILE_UPLOAD_CHUNKED', 'FILE', record.id, {
-        filename: session.filename,
-        totalSize,
-        totalChunks: session.totalChunks
-      }, req.ip);
+
 
       // Cleanup
       await deleteUploadSession(uploadId);
